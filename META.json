@@ -13,6 +13,21 @@
             "version": "0.1"
         }
     },
+
+    "prereqs": {
+        "runtime": {
+            "requires": {
+                "trunklet": 0
+            },
+
+        "test": {
+            "requires": {
+                "pgTAP": 0
+            }
+        }
+    },
+
+
     "release_status": "unstable",
 
     "generated_by": "Jim Nasby <Jim.Nasby@BlueTreble.com>",
