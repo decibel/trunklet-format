@@ -1,0 +1,4 @@
+# trunklet-format extension
+comment = 'A short description'
+default_version = '0.1'
+relocatable = true
