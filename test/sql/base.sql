@@ -1,25 +1,59 @@
-\set ECHO 0
-BEGIN;
-\i sql/trunklet-format.sql
-\set ECHO all
+\set ECHO none
+\i test/helpers/setup.sql
 
--- You should write your tests
+/*
+CREATE TABLE process(
+  template text
+  , parameter jsonb
+  , result text
+);
+*/
 
-SELECT trunklet-format('foo', 'bar');
-
-SELECT 'foo' #? 'bar' AS arrowop;
-
-CREATE TABLE ab (
-    a_field trunklet-format
+SELECT no_plan();
+SELECT is(
+  trunklet.process(
+    'format'
+    , text $$No parameters.$$
+    , NULL::jsonb
+  )
+  , $$No parameters.$$
+);
+SELECT is(
+  trunklet.process(
+    'format'
+    , text $$No parameters.$$
+    , jsonb $${"Moo": "cow"}$$
+  )
+  , $$No parameters.$$
 );
 
-INSERT INTO ab VALUES('foo' #? 'bar');
-SELECT (a_field).a, (a_field).b FROM ab;
+SELECT is(
+  trunklet.process(
+    'format'
+    , text $$A %test%s test.$$
+    , jsonb $${
+        "test": "simple"
+      }$$
+  )
+  , $$A simple test.$$
+);
 
-SELECT (trunklet-format('foo', 'bar')).a;
-SELECT (trunklet-format('foo', 'bar')).b;
-
-SELECT ('foo' #? 'bar').a;
-SELECT ('foo' #? 'bar').b;
+SELECT is(
+  trunklet.process(
+    'format'
+    , $$%start%s%middle%s%end%s$$::text
+    , jsonb $${
+        "start": "This is the start.\n",
+        "middle": "This is the middle.\n",
+        "end": "This is the end.\n"
+      }$$
+  )
+  , $$This is the start.
+This is the middle.
+This is the end.
+$$
+);
 
 ROLLBACK;
+
+-- vi: expandtab ts=2 sw=2

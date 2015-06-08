@@ -1,0 +1,6 @@
+\set ECHO none
+ template_language__add 
+------------------------
+ 
+(1 row)
+
