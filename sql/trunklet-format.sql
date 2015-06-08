@@ -50,7 +50,7 @@ BEGIN
   BEGIN
     /*
      * We have to special-case the first element because we know it must be
-     * plain text with no paramaters.
+     * plain text with no paramaters, or empty if the template starts with '%%'.
      */
     v_return := c_parse[1];
     WHILE v_pos <= c_alen LOOP
@@ -61,7 +61,15 @@ BEGIN
        * The %% escape gives us an empty v_cur.
        */
       IF v_cur = '' THEN
-        v_return := v_return || '%';
+        -- The next parse element won't be a 
+        /*
+         * If we have the template '1 %% 2 %param%s' then when we hid this
+         * condition we're 'inside' the %% (v_pos = 2, v_cur = ''). The code
+         * below this IF block depends on v_cur being a parameter name. This
+         * means we have to consume v_pos = 3 before continuing.
+         */
+        v_return := v_return || '%' || c_parse[v_pos + 1];
+        v_pos := v_pos + 2;
         CONTINUE;
       END IF;
 
@@ -69,7 +77,7 @@ BEGIN
        * Since we don't allow % in a parameter name, we know that v_cur is the name of a parameter.
        */
       IF (c_param->v_cur) IS NULL THEN
-        RAISE EXCEPTION 'parameter % not found', v_cur
+        RAISE EXCEPTION 'parameter "%" not found', v_cur
           USING DETAIL = 'parse position ' || v_pos
         ;
       END IF;
@@ -86,7 +94,7 @@ BEGIN
       v_first := substr( v_cur, 1, 1 );
       --RAISE WARNING 'v_pos = %, v_cur = %, v_first = %', v_pos, v_cur, v_first;
       IF v_first NOT IN ( 's', 'I', 'L' ) THEN
-        RAISE EXCEPTION 'Unexpected character % trailing parameter name', v_first
+        RAISE EXCEPTION 'Unexpected character "%" trailing parameter "%"', v_first, c_parse[v_pos - 1]
           USING DETAIL = format( 'parse position %s, parameter name %s', v_pos, c_parse[v_pos - 1] )
         ;
       END IF;

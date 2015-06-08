@@ -3,3 +3,18 @@ ok 1
 ok 2
 ok 3
 ok 4
+ok 5
+ok 6
+ok 7 - Should throw exception like 'Unexpected character "%" trailing parameter "Moo"'
+ok 8 - Should throw exception like 'Unexpected character "%" trailing parameter "Moo"'
+ok 9 - Should throw exception like 'Unexpected character "%" trailing parameter "Moo"'
+ok 10 - Should throw exception like 'Unexpected character "%" trailing parameter "Moo"'
+ok 11 - Should throw exception like 'Unexpected character "%" trailing parameter "Moo"'
+ok 12 - Should throw exception like 'parameter "mia" not found'
+ok 13 - Should throw exception like 'parameter "mia" not found'
+ok 14 - Should throw exception like 'parameter "mia" not found'
+ok 15 - Should throw exception like 'parameter "mia" not found'
+ok 16 - Should throw exception like 'parameter "mia" not found'
+ok 17 - Should throw exception like 'parameter "mia" not found'
+ok 18 - Should throw exception like 'parameter "mia" not found'
+ok 19 - Should throw exception like 'parameter "mia" not found'
