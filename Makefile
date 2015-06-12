@@ -48,7 +48,7 @@ results: test
 	rsync -rlpgovP results/ test/expected
 
 rmtag:
-	git branch -d $(EXTVERSION)
+	@test -z "$$(git branch --list $(EXTVERSION))" || git branch -d $(EXTVERSION)
 
 tag:
 	@test -z "$$(git status --porcelain)" || (echo 'Untracked changes!'; echo; git status; exit 1)
