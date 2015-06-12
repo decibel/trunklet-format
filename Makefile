@@ -48,6 +48,7 @@ results: test
 	rsync -rlpgovP results/ test/expected
 
 tag:
+	@test -z "$$(git status --porcelain)" || (echo 'Untracked changes!'; echo; git status; exit 1)
 	git branch $(EXTVERSION)
 	git push --set-upstream origin $(EXTVERSION)
 
