@@ -1,13 +1,13 @@
 {
     "name": "trunklet-format",
-    "abstract": "A format()-based template language for trunklet"
+    "abstract": "A format()-based template language for trunklet",
     "description": "A template language that is based on format() but allows for named parameters",
     "version": "0.1",
     "maintainer": "Jim Nasby <Jim.Nasby@BlueTreble.com>",
     "license": {"BSD 2 Clause": "http://opensource.org/licenses/bsd-license.php"},
     "provides": {
         "trunklet-format": {
-            "abstract": "A format()-based template language for trunklet"
+            "abstract": "A format()-based template language for trunklet",
             "file": "sql/trunklet-format.sql",
             "docfile": "doc/trunklet-format.md",
             "version": "0.1"
