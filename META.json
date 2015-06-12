@@ -18,7 +18,8 @@
         "runtime": {
             "requires": {
                 "trunklet": 0
-            },
+            }
+        },
 
         "test": {
             "requires": {
