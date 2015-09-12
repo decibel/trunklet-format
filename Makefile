@@ -16,9 +16,12 @@ REGRESS_OPTS = --inputdir=test --load-language=plpgsql
 PG_CONFIG    = pg_config
 
 EXTRA_CLEAN  = $(wildcard $(EXTENSION)-*.zip)
+
+# Get Postgres version, as well as major (9.4, etc) version. Remove '.' from MAJORVER.
 VERSION 	 = $(shell $(PG_CONFIG) --version | awk '{print $$2}' | sed -e 's/devel$$//')
 MAJORVER 	 = $(shell echo $(VERSION) | cut -d . -f1,2 | tr -d .)
 
+# Function for testing a condition
 test		 = $(shell test $(1) $(2) $(3) && echo yes || echo no)
 
 GE91		 = $(call test, $(MAJORVER), -ge, 91)
@@ -39,8 +42,23 @@ include $(PGXS)
 # Don't have installcheck bomb on error
 .IGNORE: installcheck
 
+#
+# pgtap
+#
+.PHONY: pgtap
+pgtap: $(DESTDIR)$(datadir)/extension/pgtap.control
+
+$(DESTDIR)$(datadir)/extension/pgtap.control:
+	pgxn install pgtap
+
+#
+# testdeps
+#
+.PHONY: testdeps
+testdeps: pgtap
+
 .PHONY: test
-test: clean install installcheck
+test: clean testdeps install installcheck
 	@if [ -r regression.diffs ]; then cat regression.diffs; fi
 
 .PHONY: results
@@ -48,7 +66,9 @@ results: test
 	rsync -rlpgovP results/ test/expected
 
 rmtag:
+	git fetch origin # Update our remotes
 	@test -z "$$(git branch --list $(EXTVERSION))" || git branch -d $(EXTVERSION)
+	@test -z "$$(git branch --list -r origin/$(EXTVERSION))" || git push --delete origin $(EXTVERSION)
 
 tag:
 	@test -z "$$(git status --porcelain)" || (echo 'Untracked changes!'; echo; git status; exit 1)

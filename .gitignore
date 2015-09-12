@@ -7,10 +7,10 @@
 .deps/
 
 # dist output
-/variant-*.zip
+/trunklet-format-*.zip
 
-/sql/variant--*
-!/sql/variant--*--*.sql
+/sql/trunklet-format--*
+!/sql/trunklet-format--*--*.sql
 
 # Test artifacts
 results/
@@ -18,4 +18,5 @@ regression.diffs
 regression.out
 
 # Misc crap
+.DS_Store
 tmp/
