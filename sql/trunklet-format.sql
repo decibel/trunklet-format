@@ -9,29 +9,31 @@ DECLARE
   v_return text;
 BEGIN
   IF jsonb_typeof(c_param) <> 'object' THEN
-    RAISE EXCEPTION 'parameter must be a JSON object, not %', jsonb_typeof(c_param)
+    RAISE EXCEPTION 'parameters must be a JSON object, not %', jsonb_typeof(c_param)
       USING DETAIL = 'parameters = ' || c_param
     ;
   END IF;
 
   -- Sanity-check parameters
   DECLARE
-    paramater_name text;
+    parameter_name text;
     value text;
     v_type text;
   BEGIN
-    FOR paramater_name, value IN SELECT * FROM jsonb_each( c_param )
+    FOR parameter_name, value IN SELECT * FROM jsonb_each( c_param )
     LOOP
-      IF paramater_name ~ '%' THEN
-        RAISE EXCEPTION 'parameter names may not contain %'
-          USING DETAIL = 'parameter ' || paramater_name
+      IF parameter_name ~ '%' THEN
+        RAISE EXCEPTION
+          USING DETAIL = 'parameter_name ' || parameter_name
+            -- MESSAGE instead of trying to escape %
+            , MESSAGE = 'parameter names may not contain "%"'
         ;
       END IF;
 
-      v_type := jsonb_typeof( c_param->paramater_name );
+      v_type := jsonb_typeof( c_param->parameter_name );
       IF v_type IN ( 'array', 'object' ) THEN
         RAISE EXCEPTION '% is not supported as a parameter type', v_type
-          USING DETAIL = format( $$paramater %s = %s$$, paramater_name, value )
+          USING DETAIL = format( $$paramater %s = %s$$, parameter_name, value )
         ;
       END IF;
     END LOOP;
