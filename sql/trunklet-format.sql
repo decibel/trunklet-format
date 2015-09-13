@@ -8,6 +8,7 @@ DECLARE
   c_param CONSTANT jsonb := parameters::jsonb;
   v_return text;
 BEGIN
+  -- DUPLICATED IN BOTH FUNCTIONS
   IF jsonb_typeof(c_param) <> 'object' THEN
     RAISE EXCEPTION 'parameters must be a JSON object, not %', jsonb_typeof(c_param)
       USING DETAIL = 'parameters = ' || c_param
@@ -15,6 +16,7 @@ BEGIN
   END IF;
 
   -- Sanity-check parameters
+  -- DUPLICATED IN BOTH FUNCTIONS
   DECLARE
     parameter_name text;
     value text;
@@ -111,8 +113,63 @@ END
 $process_body$
   , extract_parameters_options := 'LANGUAGE plpgsql'
   , extract_parameters_body := $extract_body$
+DECLARE
+  c_param CONSTANT jsonb := parameters::jsonb;
+  a_as text[];
+  sql text;
+  r record;
 BEGIN
-    RETURN NULL::jsonb;
+  -- DUPLICATED IN BOTH FUNCTIONS
+  IF jsonb_typeof(c_param) <> 'object' THEN
+    RAISE EXCEPTION 'parameters must be a JSON object, not %', jsonb_typeof(c_param)
+      USING DETAIL = 'parameters = ' || c_param
+    ;
+  END IF;
+
+  -- Sanity-check parameters
+  -- DUPLICATED IN BOTH FUNCTIONS
+  DECLARE
+    parameter_name text;
+    value text;
+    v_type text;
+  BEGIN
+    FOR parameter_name, value IN SELECT * FROM jsonb_each( c_param )
+    LOOP
+      IF parameter_name ~ '%' THEN
+        RAISE EXCEPTION
+          USING DETAIL = 'parameter_name ' || parameter_name
+            -- MESSAGE instead of trying to escape %
+            , MESSAGE = 'parameter names may not contain "%"'
+        ;
+      END IF;
+
+      v_type := jsonb_typeof( c_param->parameter_name );
+      IF v_type IN ( 'array', 'object' ) THEN
+        RAISE EXCEPTION '% is not supported as a parameter type', v_type
+          USING DETAIL = format( $$paramater %s = %s$$, parameter_name, value )
+        ;
+      END IF;
+
+      -- THIS IS SPECIFIC TO extract_parametrs
+      IF parameter_name = ANY( extract_list ) THEN
+        a_as := a_as || format(
+          '%I %s'
+          , parameter_name
+          , CASE
+              WHEN v_type IN( 'string', 'null' ) THEN 'text'
+              WHEN v_type = 'number' THEN 'numeric'
+              -- array and object can't happen
+              ELSE v_type
+            END
+        );
+      END IF;
+    END LOOP;
+  END;
+
+  sql := 'SELECT * FROM jsonb_to_record($1) AS j(' || array_to_string( a_as, ', ' ) || ')';
+  RAISE DEBUG 'sql = %', sql;
+  EXECUTE sql INTO r USING c_param;
+  RETURN row_to_json(r)::jsonb;
 END
 $extract_body$
 );

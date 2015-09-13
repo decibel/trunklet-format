@@ -110,6 +110,35 @@ SELECT throws_like(
   , (VALUES ('{"Moo":1}'), (NULL)
     ) param( param )
 ;
+
+CREATE TEMP VIEW extract_test AS
+  SELECT *
+    FROM ( VALUES
+          ( '{s1}'::text[], '{ "s1": "string 1" }'::jsonb         , 'single string'::text )
+        , ( '{num}'       , '{ "num": 1.1 }'                      , 'number' )
+        , ( '{t,f,"null"}', '{ "t":true,"f":false,"null":null }'  , 'multiple' )
+        , ( '{num,bogus}' , '{ "num": 1.1 }'                      , 'num & bogus' )
+      ) AS v( extract_list, expected, description )
+;
+
+SELECT is(
+    trunklet.extract_parameters(
+      'format'
+      , '{
+        "s1": "string 1",
+        "s2": "string 2",
+        "num": 1.1,
+        "t": true,
+        "f": false,
+        "null": null
+      }'::jsonb
+      , extract_list
+    )::jsonb
+    , expected
+    , 'Test extract_paramaters() for ' || description
+  )
+  FROM extract_test
+;
 ROLLBACK;
 
 -- vi: expandtab ts=2 sw=2
