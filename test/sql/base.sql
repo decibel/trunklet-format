@@ -14,7 +14,7 @@ SET statement_timeout = '2 s';
 
 SELECT no_plan();
 SELECT is(
-  trunklet.process(
+  trunklet.process_language(
     'format'
     , text $$No parameters.$$
     , NULL::jsonb
@@ -22,7 +22,7 @@ SELECT is(
   , $$No parameters.$$
 );
 SELECT is(
-  trunklet.process(
+  trunklet.process_language(
     'format'
     , text $$No parameters.$$
     , jsonb $${"Moo": "cow"}$$
@@ -31,7 +31,7 @@ SELECT is(
 );
 
 SELECT is(
-  trunklet.process(
+  trunklet.process_language(
     'format'
     , text $$A %test%s test.$$
     , jsonb $${
@@ -42,7 +42,7 @@ SELECT is(
 );
 
 SELECT is(
-  trunklet.process(
+  trunklet.process_language(
     'format'
     , text $$%% 1 %% 2 %%$$
     , jsonb $${"Moo": "cow"}$$
@@ -50,7 +50,7 @@ SELECT is(
   , $$% 1 % 2 %$$
 );
 SELECT is(
-  trunklet.process(
+  trunklet.process_language(
     'format'
     , text $$%%%Moo%s%%%Moo%L%%%Moo%I%%$$
     , jsonb $${"Moo": "says cow"}$$
@@ -59,7 +59,7 @@ SELECT is(
 );
 
 SELECT is(
-  trunklet.process(
+  trunklet.process_language(
     'format'
     , $$%start%s%middle%s%end%s$$::text
     , jsonb $${
@@ -76,7 +76,7 @@ $$
 
 SELECT throws_like(
     format(
-      $$SELECT trunklet.process( 'format', %L::text, %L::jsonb )$$
+      $$SELECT trunklet.process_language( 'format', %L::text, %L::jsonb )$$
       , input
       , param
     )
@@ -95,7 +95,7 @@ SELECT throws_like(
 
 SELECT throws_like(
     format(
-      $$SELECT trunklet.process( 'format', %L::text, %L::jsonb )$$
+      $$SELECT trunklet.process_language( 'format', %L::text, %L::jsonb )$$
       , input
       , param
     )
