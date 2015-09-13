@@ -27,7 +27,7 @@ test		 = $(shell test $(1) $(2) $(3) && echo yes || echo no)
 GE91		 = $(call test, $(MAJORVER), -ge, 91)
 
 ifeq ($(GE91),yes)
-all: sql/$(EXTENSION)--$(EXTVERSION).sql
+all: deps sql/$(EXTENSION)--$(EXTVERSION).sql
 
 sql/$(EXTENSION)--$(EXTVERSION).sql: sql/$(EXTENSION).sql
 	cp $< $@
@@ -41,6 +41,18 @@ include $(PGXS)
 
 # Don't have installcheck bomb on error
 .IGNORE: installcheck
+
+#
+# OTHER DEPS
+#
+.PHONY: deps
+deps: trunklet
+
+.PHONY: trunklet
+trunklet: $(DESTDIR)$(datadir)/extension/trunklet.control
+
+$(DESTDIR)$(datadir)/extension/trunklet.control:
+	pgxn install --unstable trunklet >= 0.1.0
 
 #
 # pgtap
