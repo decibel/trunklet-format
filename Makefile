@@ -1,46 +1,9 @@
-EXTENSION = $(shell grep -m 1 '"name":' META.json | \
-sed -e 's/[[:space:]]*"name":[[:space:]]*"\([^"]*\)",/\1/')
-EXTVERSION = $(shell grep -m 1 '"version":' META.json | \
-sed -e 's/[[:space:]]*"version":[[:space:]]*"\([^"]*\)",\{0,1\}/\1/')
+include pgxntool/base.mk
 
-DATA         = $(filter-out $(wildcard sql/*--*.sql),$(wildcard sql/*.sql))
-DOCS         = $(wildcard doc/*.asc)
-TESTS        = $(wildcard test/sql/*.sql)
-REGRESS      = $(patsubst test/sql/%.sql,%,$(TESTS))
-REGRESS_OPTS = --inputdir=test --load-language=plpgsql
-#
-# Uncoment the MODULES line if you are adding C files
-# to your extention.
-#
-#MODULES      = $(patsubst %.c,%,$(wildcard src/*.c))
-PG_CONFIG    = pg_config
+# TODO: Remove this after merging pgxntool 0.2.1+
+testdeps: $(TEST_SQL_FILES) $(TEST_SOURCE_FILES)
 
-EXTRA_CLEAN  = $(wildcard $(EXTENSION)-*.zip)
-
-# Get Postgres version, as well as major (9.4, etc) version. Remove '.' from MAJORVER.
-VERSION 	 = $(shell $(PG_CONFIG) --version | awk '{print $$2}' | sed -e 's/devel$$//')
-MAJORVER 	 = $(shell echo $(VERSION) | cut -d . -f1,2 | tr -d .)
-
-# Function for testing a condition
-test		 = $(shell test $(1) $(2) $(3) && echo yes || echo no)
-
-GE91		 = $(call test, $(MAJORVER), -ge, 91)
-
-ifeq ($(GE91),yes)
-all: deps sql/$(EXTENSION)--$(EXTVERSION).sql
-
-sql/$(EXTENSION)--$(EXTVERSION).sql: sql/$(EXTENSION).sql
-	cp $< $@
-
-DATA = $(wildcard sql/*--*.sql)
-EXTRA_CLEAN += sql/$(EXTENSION)--$(EXTVERSION).sql
-endif
-
-PGXS := $(shell $(PG_CONFIG) --pgxs)
-include $(PGXS)
-
-# Don't have installcheck bomb on error
-.IGNORE: installcheck
+testdeps: $(TESTDIR)/deps.sql $(TESTDIR)/load.sql
 
 #
 # OTHER DEPS
@@ -53,48 +16,3 @@ trunklet: $(DESTDIR)$(datadir)/extension/trunklet.control
 
 $(DESTDIR)$(datadir)/extension/trunklet.control:
 	pgxn install --unstable trunklet >= 0.1.0
-
-#
-# pgtap
-#
-.PHONY: pgtap
-pgtap: $(DESTDIR)$(datadir)/extension/pgtap.control
-
-$(DESTDIR)$(datadir)/extension/pgtap.control:
-	pgxn install pgtap
-
-#
-# testdeps
-#
-.PHONY: testdeps
-testdeps: pgtap
-
-.PHONY: test
-test: clean testdeps install installcheck
-	@if [ -r regression.diffs ]; then cat regression.diffs; fi
-
-.PHONY: results
-results: test
-	rsync -rlpgovP results/ test/expected
-
-rmtag:
-	git fetch origin # Update our remotes
-	@test -z "$$(git branch --list $(EXTVERSION))" || git branch -d $(EXTVERSION)
-	@test -z "$$(git branch --list -r origin/$(EXTVERSION))" || git push --delete origin $(EXTVERSION)
-
-tag:
-	@test -z "$$(git status --porcelain)" || (echo 'Untracked changes!'; echo; git status; exit 1)
-	git branch $(EXTVERSION)
-	git push --set-upstream origin $(EXTVERSION)
-
-.PHONY: forcetag
-forcetag: rmtag tag
-
-dist: tag
-	git archive --prefix=$(EXTENSION)-$(EXTVERSION)/ -o ../$(EXTENSION)-$(EXTVERSION).zip $(EXTVERSION)
-
-.PHONY: forcedist
-forcedist: forcetag dist
-
-# To use this, do make print-VARIABLE_NAME
-print-%  : ; @echo $* = $($*)

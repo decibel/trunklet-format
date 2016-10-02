@@ -1,7 +1,10 @@
 \set ECHO none
-\i test/helpers/psql.sql
+\i test/pgxntool/psql.sql
 
 BEGIN;
-\i test/helpers/deps.sql
+\i test/deps.sql
 \i sql/trunklet-format.sql
-ROLLBACK;
+
+\echo # TRANSACTION INTENTIONALLY LEFT OPEN!
+
+-- vi: expandtab sw=2 ts=2

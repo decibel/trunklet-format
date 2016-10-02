@@ -1,5 +1,6 @@
 \set ECHO none
-\i test/helpers/setup.sql
+\i test/pgxntool/setup.sql
+\i test/load.sql
 
 /*
 CREATE TABLE process(
@@ -139,6 +140,7 @@ SELECT is(
   )
   FROM extract_test
 ;
-ROLLBACK;
+
+\i test/pgxntool/finish.sql
 
 -- vi: expandtab ts=2 sw=2
