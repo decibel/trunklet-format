@@ -76,13 +76,14 @@
 
         "build": {
             "requires": {
-                "PostgreSQL": "9.5.0"
+                "PostgreSQL": "9.5.0",
+                "trunklet": ">= 0.2.0"
             }
         },
         "runtime": {
             "requires": {
                 "plpgsql": 0,
-                "trunklet": 0
+                "trunklet": ">= 0.2.0"
             }
         },
         "test": {

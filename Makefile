@@ -15,4 +15,4 @@ deps: trunklet
 trunklet: $(DESTDIR)$(datadir)/extension/trunklet.control
 
 $(DESTDIR)$(datadir)/extension/trunklet.control:
-	pgxn install --unstable trunklet >= 0.1.0
+	pgxn install --unstable trunklet >= 0.2.0
