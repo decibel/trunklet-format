@@ -51,17 +51,7 @@ Once trunklet-format is installed, you can add it to a database. If you're runni
 PostgreSQL 9.1.0 or greater, it's a simple as connecting to a database as a
 super user and running:
 
-    CREATE EXTENSION trunklet-format;
-
-If you've upgraded your cluster to PostgreSQL 9.1 and already had trunklet-format
-installed, you can upgrade it to a properly packaged extension with:
-
-    CREATE EXTENSION trunklet-format FROM unpackaged;
-
-For versions of PostgreSQL less than 9.1.0, you'll need to run the
-installation script:
-
-    psql -d mydb -f /path/to/pgsql/share/contrib/trunklet-format.sql
+    CREATE EXTENSION "trunklet-format";
 
 If you want to install trunklet-format and all of its supporting objects into a specific
 schema, use the `PGOPTIONS` environment variable to specify the schema, like
