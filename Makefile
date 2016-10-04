@@ -9,10 +9,11 @@ testdeps: $(TESTDIR)/deps.sql $(TESTDIR)/load.sql
 # OTHER DEPS
 #
 .PHONY: deps
+install: deps
 deps: trunklet
 
 .PHONY: trunklet
 trunklet: $(DESTDIR)$(datadir)/extension/trunklet.control
 
 $(DESTDIR)$(datadir)/extension/trunklet.control:
-	pgxn install --unstable trunklet >= 0.2.0
+	pgxn install --unstable 'trunklet>=0.2.0'
