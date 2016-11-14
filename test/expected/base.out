@@ -19,7 +19,7 @@ DETAIL:  parameter "test parameter" at template position 11
 ERROR:  22004: SQL identifier format option ("I") not allowed with optional parameters
 DETAIL:  parameter "test parameter" at template position 11
 HINT:  SQL identifiers can not be NULL or empty, so identifier formats may not be optional.
-CONTEXT:  PL/pgSQL function _trunklet_functions.language_id_0000000001__process(text,jsonb) line 127 at RAISE
+CONTEXT:  PL/pgSQL function _trunklet_functions.language_id_0000000001__process(text,jsonb) line 135 at RAISE
 SQL statement "SELECT _trunklet_functions.language_id_0000000001__process( CAST($1 AS text), CAST($2 AS jsonb) )"
 PL/pgSQL function trunklet.process_language(character varying,text,anyelement) line 27 at EXECUTE
 LOCATION:  exec_stmt_raise, pl_exec.c:3165
@@ -37,7 +37,7 @@ THIS ERROR IS OK!
 DETAIL:  parameter "Moo" at template position 5
 ERROR:  P0001: Unexpected character "S" in format specifier "OS"
 DETAIL:  parameter "Moo" at template position 5
-CONTEXT:  PL/pgSQL function _trunklet_functions.language_id_0000000001__process(text,jsonb) line 118 at RAISE
+CONTEXT:  PL/pgSQL function _trunklet_functions.language_id_0000000001__process(text,jsonb) line 126 at RAISE
 SQL statement "SELECT _trunklet_functions.language_id_0000000001__process( CAST($1 AS text), CAST($2 AS jsonb) )"
 PL/pgSQL function trunklet.process_language(character varying,text,anyelement) line 27 at EXECUTE
 LOCATION:  exec_stmt_raise, pl_exec.c:3165
@@ -45,7 +45,7 @@ THIS ERROR IS OK!
 DETAIL:  parameter "Moo" at template position 5
 ERROR:  P0001: Unexpected character "l" in format specifier "l"
 DETAIL:  parameter "Moo" at template position 5
-CONTEXT:  PL/pgSQL function _trunklet_functions.language_id_0000000001__process(text,jsonb) line 118 at RAISE
+CONTEXT:  PL/pgSQL function _trunklet_functions.language_id_0000000001__process(text,jsonb) line 126 at RAISE
 SQL statement "SELECT _trunklet_functions.language_id_0000000001__process( CAST($1 AS text), CAST($2 AS jsonb) )"
 PL/pgSQL function trunklet.process_language(character varying,text,anyelement) line 27 at EXECUTE
 LOCATION:  exec_stmt_raise, pl_exec.c:3165
@@ -77,23 +77,24 @@ ok 50 - Test extract_paramaters() for single string
 ok 51 - Test extract_paramaters() for number
 ok 52 - Test extract_paramaters() for multiple
 ok 53 - Test extract_paramaters() for num & bogus
-ok 54 - SELECT trunklet.process_language('format', 'template', ('{"value": 1.1}'::jsonb)->'value')
-ok 55 - SELECT trunklet.process_language('format', 'template', ('{"value": "text"}'::jsonb)->'value')
-ok 56 - SELECT trunklet.process_language('format', 'template', ('{"value": true}'::jsonb)->'value')
-ok 57 - SELECT trunklet.process_language('format', 'template', ('{"value": [1, 2, 3]}'::jsonb)->'value')
-ok 58 - SELECT trunklet.extract_parameters('format', ('{"value": 1.1}'::jsonb)->'value', '{a}'::text[])
-ok 59 - SELECT trunklet.extract_parameters('format', ('{"value": "text"}'::jsonb)->'value', '{a}'::text[])
-ok 60 - SELECT trunklet.extract_parameters('format', ('{"value": true}'::jsonb)->'value', '{a}'::text[])
-ok 61 - SELECT trunklet.extract_parameters('format', ('{"value": [1, 2, 3]}'::jsonb)->'value', '{a}'::text[])
-ok 62 - process_language('format', 'template', %L::jsonb): parameter names may not contain "%"
+ok 54 - Test extract_paramaters() for bogus
+ok 55 - SELECT trunklet.process_language('format', 'template', ('{"value": 1.1}'::jsonb)->'value')
+ok 56 - SELECT trunklet.process_language('format', 'template', ('{"value": "text"}'::jsonb)->'value')
+ok 57 - SELECT trunklet.process_language('format', 'template', ('{"value": true}'::jsonb)->'value')
+ok 58 - SELECT trunklet.process_language('format', 'template', ('{"value": [1, 2, 3]}'::jsonb)->'value')
+ok 59 - SELECT trunklet.extract_parameters('format', ('{"value": 1.1}'::jsonb)->'value', '{a}'::text[])
+ok 60 - SELECT trunklet.extract_parameters('format', ('{"value": "text"}'::jsonb)->'value', '{a}'::text[])
+ok 61 - SELECT trunklet.extract_parameters('format', ('{"value": true}'::jsonb)->'value', '{a}'::text[])
+ok 62 - SELECT trunklet.extract_parameters('format', ('{"value": [1, 2, 3]}'::jsonb)->'value', '{a}'::text[])
 ok 63 - process_language('format', 'template', %L::jsonb): parameter names may not contain "%"
 ok 64 - process_language('format', 'template', %L::jsonb): parameter names may not contain "%"
-ok 65 - extract_parameters('format', %L::jsonb, '{a}'::text[]): parameter names may not contain "%"
+ok 65 - process_language('format', 'template', %L::jsonb): parameter names may not contain "%"
 ok 66 - extract_parameters('format', %L::jsonb, '{a}'::text[]): parameter names may not contain "%"
 ok 67 - extract_parameters('format', %L::jsonb, '{a}'::text[]): parameter names may not contain "%"
-ok 68 - threw object is not supported as a parameter type
-ok 69 - threw array is not supported as a parameter type
-ok 70 - threw object is not supported as a parameter type
-ok 71 - threw array is not supported as a parameter type
-1..71
+ok 68 - extract_parameters('format', %L::jsonb, '{a}'::text[]): parameter names may not contain "%"
+ok 69 - threw object is not supported as a parameter type
+ok 70 - threw array is not supported as a parameter type
+ok 71 - threw object is not supported as a parameter type
+ok 72 - threw array is not supported as a parameter type
+1..72
 # TRANSACTION INTENTIONALLY LEFT OPEN!

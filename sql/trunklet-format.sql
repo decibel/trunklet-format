@@ -238,6 +238,11 @@ BEGIN
     END LOOP;
   END;
 
+  -- Nothing matched
+  IF a_as IS NULL THEN
+    RETURN NULL;
+  END IF;
+
   sql := 'SELECT * FROM jsonb_to_record($1) AS j(' || array_to_string( a_as, ', ' ) || ')';
   RAISE DEBUG 'sql = %', sql;
   EXECUTE sql INTO r USING c_param;

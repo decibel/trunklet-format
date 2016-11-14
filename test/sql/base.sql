@@ -166,6 +166,7 @@ CREATE TEMP VIEW extract_test AS
         , ( '{num}'       , '{ "num": 1.1 }'                      , 'number' )
         , ( '{t,f,"null"}', '{ "t":true,"f":false,"null":null }'  , 'multiple' )
         , ( '{num,bogus}' , '{ "num": 1.1 }'                      , 'num & bogus' )
+        , ( '{bogus}'     , NULL                                  , 'bogus' )
       ) AS v( extract_list, expected, description )
 ;
 
