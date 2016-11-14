@@ -47,7 +47,15 @@ BEGIN
   DECLARE
     c_parse CONSTANT text[] := string_to_array( template::text, '%' );
     c_alen CONSTANT int := array_length( c_parse, 1 );
+
+    /*
+     * TODO: Instead of trying to track exact template position, it would be
+     * easier to just track the accumulated length of every c_parse element
+     * we've seen. That can be converted to template position by simply adding
+     * (v_pos-1) * length('%').
+     */
     v_template_pos int := 1 + length(c_parse[1]); -- Start at 1 and account for c_parse[1]
+
     v_pos int := 2; -- We handle first element specially
     v_format_option_position int;
     v_last_parameter_position int;
