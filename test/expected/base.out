@@ -5,22 +5,95 @@ ok 3
 ok 4
 ok 5
 ok 6
-ok 7 - Should throw exception like 'Unexpected character "%" trailing parameter "Moo"'
-ok 8 - Should throw exception like 'Unexpected character "%" trailing parameter "Moo"'
-ok 9 - Should throw exception like 'Unexpected character "%" trailing parameter "Moo"'
-ok 10 - Should throw exception like 'Unexpected character "%" trailing parameter "Moo"'
-ok 11 - Should throw exception like 'Unexpected character "%" trailing parameter "Moo"'
-ok 12 - Should throw exception like 'parameter "mia" not found'
-ok 13 - Should throw exception like 'parameter "mia" not found'
-ok 14 - Should throw exception like 'parameter "mia" not found'
-ok 15 - Should throw exception like 'parameter "mia" not found'
-ok 16 - Should throw exception like 'parameter "mia" not found'
-ok 17 - Should throw exception like 'parameter "mia" not found'
-ok 18 - Should throw exception like 'parameter "mia" not found'
-ok 19 - Should throw exception like 'parameter "mia" not found'
-ok 20 - Test extract_paramaters() for single string
-ok 21 - Test extract_paramaters() for number
-ok 22 - Test extract_paramaters() for multiple
-ok 23 - Test extract_paramaters() for num & bogus
-1..23
+ok 7 - test optional handling with s and 1.1
+ok 8 - test optional handling with s and 
+ok 9 - test optional handling with s and text
+ok 10 - test optional handling with s and true
+ok 11 - test optional handling with L and 1.1
+ok 12 - test optional handling with L and 
+ok 13 - test optional handling with L and text
+ok 14 - test optional handling with L and true
+ok 15 - threw 22004: SQL identifier format option ("I") not allowed with optional parameters
+THIS ERROR IS OK!
+DETAIL:  parameter "test parameter" at template position 11
+ERROR:  22004: SQL identifier format option ("I") not allowed with optional parameters
+DETAIL:  parameter "test parameter" at template position 11
+HINT:  SQL identifiers can not be NULL or empty, so identifier formats may not be optional.
+CONTEXT:  PL/pgSQL function _trunklet_functions.language_id_0000000001__process(text,jsonb) line 127 at RAISE
+SQL statement "SELECT _trunklet_functions.language_id_0000000001__process( CAST($1 AS text), CAST($2 AS jsonb) )"
+PL/pgSQL function trunklet.process_language(character varying,text,anyelement) line 27 at EXECUTE
+LOCATION:  exec_stmt_raise, pl_exec.c:3165
+ok 16 - threw Unexpected character "" in format specifier ""
+ok 17 - threw Unexpected character "" in format specifier "O"
+ok 18 - threw Unexpected character "a" in format specifier "a"
+ok 19 - threw Unexpected character "a" in format specifier "Oa"
+ok 20 - threw Unexpected character "S" in format specifier "S"
+ok 21 - threw Unexpected character "S" in format specifier "OS"
+ok 22 - threw Unexpected character "i" in format specifier "i"
+ok 23 - threw Unexpected character "i" in format specifier "Oi"
+ok 24 - threw Unexpected character "l" in format specifier "l"
+ok 25 - threw Unexpected character "l" in format specifier "Ol"
+THIS ERROR IS OK!
+DETAIL:  parameter "Moo" at template position 5
+ERROR:  P0001: Unexpected character "S" in format specifier "OS"
+DETAIL:  parameter "Moo" at template position 5
+CONTEXT:  PL/pgSQL function _trunklet_functions.language_id_0000000001__process(text,jsonb) line 118 at RAISE
+SQL statement "SELECT _trunklet_functions.language_id_0000000001__process( CAST($1 AS text), CAST($2 AS jsonb) )"
+PL/pgSQL function trunklet.process_language(character varying,text,anyelement) line 27 at EXECUTE
+LOCATION:  exec_stmt_raise, pl_exec.c:3165
+THIS ERROR IS OK!
+DETAIL:  parameter "Moo" at template position 5
+ERROR:  P0001: Unexpected character "l" in format specifier "l"
+DETAIL:  parameter "Moo" at template position 5
+CONTEXT:  PL/pgSQL function _trunklet_functions.language_id_0000000001__process(text,jsonb) line 118 at RAISE
+SQL statement "SELECT _trunklet_functions.language_id_0000000001__process( CAST($1 AS text), CAST($2 AS jsonb) )"
+PL/pgSQL function trunklet.process_language(character varying,text,anyelement) line 27 at EXECUTE
+LOCATION:  exec_stmt_raise, pl_exec.c:3165
+ok 26 - Should throw exception like 'parameter "mia" not found'
+ok 27 - Should throw exception like 'parameter "mia" not found'
+ok 28 - Should throw exception like 'parameter "mia" not found'
+ok 29 - Should throw exception like 'parameter "mia" not found'
+ok 30 - Should throw exception like 'parameter "mia" not found'
+ok 31 - Should throw exception like 'parameter "mia" not found'
+ok 32 - Should throw exception like 'parameter "mia" not found'
+ok 33 - Should throw exception like 'parameter "mia" not found'
+ok 34 - Should throw exception like 'parameter "mia" not found'
+ok 35 - Should throw exception like 'parameter "mia" not found'
+ok 36 - Should throw exception like 'parameter "mia" not found'
+ok 37 - Should throw exception like 'parameter "mia" not found'
+ok 38 - Should throw exception like 'parameter "mia" not found'
+ok 39 - Should throw exception like 'parameter "mia" not found'
+ok 40 - Should throw exception like 'parameter "mia" not found'
+ok 41 - Should throw exception like 'parameter "mia" not found'
+ok 42 - Should throw exception like 'parameter "mia" not found'
+ok 43 - Should throw exception like 'parameter "mia" not found'
+ok 44 - Should throw exception like 'parameter "mia" not found'
+ok 45 - Should throw exception like 'parameter "mia" not found'
+ok 46 - Should throw exception like 'parameter "mia" not found'
+ok 47 - Should throw exception like 'parameter "mia" not found'
+ok 48 - Should throw exception like 'parameter "mia" not found'
+ok 49 - Should throw exception like 'parameter "mia" not found'
+ok 50 - Test extract_paramaters() for single string
+ok 51 - Test extract_paramaters() for number
+ok 52 - Test extract_paramaters() for multiple
+ok 53 - Test extract_paramaters() for num & bogus
+ok 54 - SELECT trunklet.process_language('format', 'template', ('{"value": 1.1}'::jsonb)->'value')
+ok 55 - SELECT trunklet.process_language('format', 'template', ('{"value": "text"}'::jsonb)->'value')
+ok 56 - SELECT trunklet.process_language('format', 'template', ('{"value": true}'::jsonb)->'value')
+ok 57 - SELECT trunklet.process_language('format', 'template', ('{"value": [1, 2, 3]}'::jsonb)->'value')
+ok 58 - SELECT trunklet.extract_parameters('format', ('{"value": 1.1}'::jsonb)->'value', '{a}'::text[])
+ok 59 - SELECT trunklet.extract_parameters('format', ('{"value": "text"}'::jsonb)->'value', '{a}'::text[])
+ok 60 - SELECT trunklet.extract_parameters('format', ('{"value": true}'::jsonb)->'value', '{a}'::text[])
+ok 61 - SELECT trunklet.extract_parameters('format', ('{"value": [1, 2, 3]}'::jsonb)->'value', '{a}'::text[])
+ok 62 - process_language('format', 'template', %L::jsonb): parameter names may not contain "%"
+ok 63 - process_language('format', 'template', %L::jsonb): parameter names may not contain "%"
+ok 64 - process_language('format', 'template', %L::jsonb): parameter names may not contain "%"
+ok 65 - extract_parameters('format', %L::jsonb, '{a}'::text[]): parameter names may not contain "%"
+ok 66 - extract_parameters('format', %L::jsonb, '{a}'::text[]): parameter names may not contain "%"
+ok 67 - extract_parameters('format', %L::jsonb, '{a}'::text[]): parameter names may not contain "%"
+ok 68 - threw object is not supported as a parameter type
+ok 69 - threw array is not supported as a parameter type
+ok 70 - threw object is not supported as a parameter type
+ok 71 - threw array is not supported as a parameter type
+1..71
 # TRANSACTION INTENTIONALLY LEFT OPEN!

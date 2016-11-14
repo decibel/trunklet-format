@@ -11,7 +11,7 @@ BEGIN
   -- DUPLICATED IN BOTH FUNCTIONS
   IF jsonb_typeof(c_param) <> 'object' THEN
     RAISE EXCEPTION 'parameters must be a JSON object, not %', jsonb_typeof(c_param)
-      USING DETAIL = 'parameters = ' || c_param
+      USING DETAIL = format('parameters = %L', c_param)
     ;
   END IF;
 
@@ -47,9 +47,14 @@ BEGIN
   DECLARE
     c_parse CONSTANT text[] := string_to_array( template::text, '%' );
     c_alen CONSTANT int := array_length( c_parse, 1 );
+    v_template_pos int := 1 + length(c_parse[1]); -- Start at 1 and account for c_parse[1]
     v_pos int := 2; -- We handle first element specially
-    v_cur text;
-    v_first text;
+    v_format_option_position int;
+    v_last_parameter_position int;
+    v_cur text = ''; -- Needs to start at '' for template position tracking
+    v_parameter text;
+    v_optional boolean;
+    v_format_option text;
     v_value text;
   BEGIN
     /*
@@ -58,52 +63,111 @@ BEGIN
      */
     v_return := c_parse[1];
     WHILE v_pos <= c_alen LOOP
+      v_template_pos := v_template_pos + 1; -- We just consumed a %
       v_cur := c_parse[v_pos];
-      --RAISE WARNING 'v_pos = %, v_cur = %', v_pos, v_cur;
+      --RAISE WARNING 'v_template_pos = %, v_pos = %, v_cur = %', v_template_pos, v_pos, v_cur;
 
       /*
        * The %% escape gives us an empty v_cur.
        */
       IF v_cur = '' THEN
-        -- The next parse element won't be a 
         /*
-         * If we have the template '1 %% 2 %param%s' then when we hid this
+         * If we have the template '1 %% 2 %param%s' then when we hit this
          * condition we're 'inside' the %% (v_pos = 2, v_cur = ''). The code
          * below this IF block depends on v_cur being a parameter name. This
-         * means we have to consume v_pos = 3 before continuing.
+         * means we have to consume the NEXT array element (v_pos = 3) before
+         * continuing, because it could ALSO be empty (ie: '%%%param%s'). It
+         * could NOT be a parameter though.
          */
+
+        -- Update our position
+        v_template_pos = v_template_pos + length(c_parse[v_pos + 1]) + 1;
+        -- v_cur will immediately be reset
+        
+        -- Append the % and the next array element
         v_return := v_return || '%' || c_parse[v_pos + 1];
         v_pos := v_pos + 2;
         CONTINUE;
       END IF;
 
       /*
-       * Since we don't allow % in a parameter name, we know that v_cur is the name of a parameter.
+       * Since we don't allow % in a parameter name, we know that v_cur IS THE NAME OF A PARAMETER.
        */
-      IF (c_param->v_cur) IS NULL THEN
-        RAISE EXCEPTION 'parameter "%" not found', v_cur
-          USING DETAIL = 'parse position ' || v_pos
-        ;
-      END IF;
-      v_value := CASE WHEN jsonb_typeof(c_param->v_cur) = 'null' THEN NULL ELSE c_param->>v_cur END;
+      v_last_parameter_position := v_template_pos - 1; -- -1 for the '%'
+      v_parameter := v_cur;
       v_pos := v_pos + 1;
       IF v_pos > c_alen THEN
         RAISE EXCEPTION 'Reached end of template while processing parameters'
-          USING HINT = 'Parameters must match the format "%parameter_name%T" where T is s, I or L.'
+          USING HINT = E'Parameters must match the format "%parameter_name%[O]T" where T is s, I or L\n'
+            || 'and O (if present) means the parameter is optional.'
         ;
       END IF;
+
+      v_template_pos = v_template_pos + length(v_cur) + 1;
       v_cur := c_parse[v_pos];
+      --RAISE WARNING 'v_template_pos = %, v_pos = %, v_cur = %', v_template_pos, v_pos, v_cur;
+      /*
+       * At this point v_cur IS THE OPTIONS SPECIFIER
+       */
 
       -- This is where to insert support for other format option handling
-      v_first := substr( v_cur, 1, 1 );
-      --RAISE WARNING 'v_pos = %, v_cur = %, v_first = %', v_pos, v_cur, v_first;
-      IF v_first NOT IN ( 's', 'I', 'L' ) THEN
-        RAISE EXCEPTION 'Unexpected character "%" trailing parameter "%"', v_first, c_parse[v_pos - 1]
-          USING DETAIL = format( 'parse position %s, parameter name %s', v_pos, c_parse[v_pos - 1] )
+      -- These ugly shenanigans are to avoid copying a potentially large string multiple times
+      v_optional := substr( v_cur, 1, 1 ) = 'O';
+      v_format_option_position := CASE v_optional WHEN true THEN 2 WHEN false THEN 1 END;
+      v_template_pos = v_template_pos + v_format_option_position - 1; -- -1 because we haven't technically consumed the format specifier yet
+      v_format_option = substr( v_cur, v_format_option_position, 1 );
+      --RAISE WARNING 'FORMAT OPTION %, v_template_pos = %, v_pos = %, v_format_option_position = %, v_cur = %', v_format_option, v_template_pos, v_pos, v_format_option_position, v_cur;
+
+      --RAISE WARNING 'v_pos = %, v_cur = %, v_format_option = %', v_pos, v_cur, v_format_option;
+      IF v_format_option NOT IN ( 's', 'I', 'L' ) THEN
+        RAISE EXCEPTION 'Unexpected character "%" in format specifier "%"'
+            , v_format_option
+            , substr(v_cur, 1, v_format_option_position )
+          USING DETAIL = format( 'parameter "%s" at template position %s', v_parameter, v_last_parameter_position )
         ;
       END IF;
 
-      v_return := v_return || format( '%' || v_first, v_value ) || substr( v_cur, 2 );
+      IF v_optional THEN
+        IF v_format_option = 'I' THEN
+          RAISE EXCEPTION 'SQL identifier format option ("I") not allowed with optional parameters'
+            USING ERRCODE = 'null_value_not_allowed'
+              , HINT = 'SQL identifiers can not be NULL or empty, so identifier formats may not be optional.'
+              , DETAIL = format( 'parameter "%s" at template position %s', v_parameter, v_last_parameter_position )
+          ;
+        END IF;
+        -- c_param->v_parameter will ONLY be NULL if v_parameter doesn't exist in the document
+      ELSIF (c_param->v_parameter) IS NULL THEN
+        RAISE EXCEPTION 'parameter "%" not found', v_parameter
+          USING DETAIL = format( 'at template position %s', v_last_parameter_position )
+        ;
+      END IF;
+
+
+      -- Now that we've consumed the format specifier, update v_template_pos and grab our value
+      v_template_pos := v_template_pos + 1;
+      v_value := c_param->>v_parameter;
+
+      /*
+      RAISE WARNING 'v_template_pos = %, v_pos = %, v_parameter = %, v_format_option = %, v_value = %, v_format_option_position = %'
+        , v_template_pos, v_pos, v_parameter, v_format_option, v_value, v_format_option_position
+        USING DETAIL = format(
+          'prior "%s", next: "%s"'
+          , substr(template, v_template_pos-20, 20)
+          , substr(template, v_template_pos, 20)
+        )
+      ;
+      */
+      v_return := v_return
+        -- This is the actual replacement
+        || format(
+          '%' || v_format_option
+          , v_value
+        )
+
+        -- Remainder of document, up to next '%'
+        || substr( v_cur, v_format_option_position + 1 )
+      ;
+      v_template_pos := v_template_pos + length(v_cur) - v_format_option_position;
       v_pos := v_pos + 1;
     END LOOP;
   END;
@@ -122,7 +186,7 @@ BEGIN
   -- DUPLICATED IN BOTH FUNCTIONS
   IF jsonb_typeof(c_param) <> 'object' THEN
     RAISE EXCEPTION 'parameters must be a JSON object, not %', jsonb_typeof(c_param)
-      USING DETAIL = 'parameters = ' || c_param
+      USING DETAIL = format('parameters = %L', c_param)
     ;
   END IF;
 

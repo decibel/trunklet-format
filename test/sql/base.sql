@@ -12,7 +12,6 @@ CREATE TABLE process(
 
 -- Protect against infinite loops
 SET statement_timeout = '2 s';
-
 SELECT no_plan();
 SELECT is(
   trunklet.process_language(
@@ -75,29 +74,76 @@ This is the end.
 $$
 );
 
-SELECT throws_like(
+SELECT is(
+      trunklet.process_language(
+        'format'
+        , replace(
+          $$%opt%OR%value%R%opt%OR%value%R$$
+          , 'R'
+          , replace
+        )
+        , j
+      )
+      , repeat( format(
+        replace( '%R%R', 'R', replace )
+        , NULL
+        , j->>'value'
+      ), 2 )
+      , format( 'test optional handling with %s and %s', replace, j->>'value' )
+    )
+  FROM unnest('{s,L}'::text[]) r(replace)
+    , (SELECT row_to_json(v) AS j FROM (VALUES
+      (to_json(1.1))
+      , (to_json(NULL::int))
+      , (to_json('text'::text))
+      , (to_json(true))
+    ) v(value) ) j
+;
+
+SELECT throws_ok(
+  $$SELECT trunklet.process_language( 'format', 'some stuff%test parameter%OIsome more stuff', NULL::json )$$
+  , '22004' -- null_value_not_allowed
+  , 'SQL identifier format option ("I") not allowed with optional parameters'
+);
+SAVEPOINT a;
+\unset ON_ERROR_STOP
+\echo THIS ERROR IS OK!
+SELECT 'DETAIL:  parameter "test parameter" at template position ' || strpos( 'some stuff%test parameter%OIsome more stuff', '%' );
+SELECT trunklet.process_language( 'format', 'some stuff%test parameter%OIsome more stuff', NULL::json );
+ROLLBACK TO a;
+\set ON_ERROR_STOP 1
+
+SELECT throws_ok(
     format(
       $$SELECT trunklet.process_language( 'format', %L::text, %L::jsonb )$$
-      , input
-      , param
+      , '%Moo%' || optional || specifier
+      , '{"Moo":1}'
     )
-    , 'Unexpected character "%" trailing parameter "Moo"'
+    , format(
+      'Unexpected character "%s" in format specifier "%s"'
+      , specifier
+      , optional || specifier
+    )
   )
-  FROM (VALUES
-        ('%Moo%')
-      , ('%Moo%a')
-      , ('%Moo%S')
-      , ('%Moo%i')
-      , ('%Moo%l')
-    ) input( input )
-  , (VALUES ('{"Moo":1}')
-    ) param( param )
+  FROM unnest('{"",a,S,i,l}'::text[]) s(specifier)
+    , unnest('{"",O}'::text[]) o(optional)
 ;
+SAVEPOINT a;
+\unset ON_ERROR_STOP
+\echo THIS ERROR IS OK!
+SELECT 'DETAIL:  parameter "Moo" at template position ' || strpos( 'more%Moo%OSmore', '%' );
+SELECT trunklet.process_language('format', 'more%Moo%OSmore', NULL::json);
+ROLLBACK TO a;
+\echo THIS ERROR IS OK!
+SELECT 'DETAIL:  parameter "Moo" at template position ' || strpos( 'more%Moo%OSmore', '%' );
+SELECT trunklet.process_language('format', 'more%Moo%lmore', NULL::json);
+ROLLBACK TO a;
+\set ON_ERROR_STOP 1
 
 SELECT throws_like(
     format(
       $$SELECT trunklet.process_language( 'format', %L::text, %L::jsonb )$$
-      , input
+      , replace(input, 's', replacement)
       , param
     )
     , 'parameter "mia" not found'
@@ -110,6 +156,7 @@ SELECT throws_like(
     ) input( input )
   , (VALUES ('{"Moo":1}'), (NULL)
     ) param( param )
+  , unnest('{s,I,L}'::text[]) u(replacement)
 ;
 
 CREATE TEMP VIEW extract_test AS
@@ -139,6 +186,66 @@ SELECT is(
     , 'Test extract_paramaters() for ' || description
   )
   FROM extract_test
+;
+
+/*
+ * Common syntax checking code
+ */
+SELECT throws_ok(
+    format(
+      $$SELECT trunklet.$$ || format
+      , j
+    )
+    , format( 'parameters must be a JSON object, not %s', jsonb_typeof(j->'value') )
+    , format(
+      $$SELECT trunklet.$$ || format
+      , j
+    )
+  )
+  FROM
+    unnest(array[
+        $$process_language('format', 'template', (%L::jsonb)->'value')$$
+      , $$extract_parameters('format', (%L::jsonb)->'value', '{a}'::text[])$$
+    ]) f(format)
+    , (SELECT row_to_json(v)::jsonb AS j FROM (VALUES
+      (to_json(1.1))
+      , (to_json('text'::text))
+      , (to_json(true))
+      , (to_json(array[1,2,3]))
+    ) v(value) ) j
+;
+SELECT throws_ok(
+    format(
+      $$SELECT trunklet.$$ || format
+      , format( '{"%s":1}', key )
+    )
+    , NULL
+    , 'parameter names may not contain "%"'
+    , format || ': parameter names may not contain "%"'
+  )
+  FROM
+    unnest(array[
+        $$process_language('format', 'template', %L::jsonb)$$
+      , $$extract_parameters('format', %L::jsonb, '{a}'::text[])$$
+    ]) f(format)
+    , unnest('{% key,key %,k%k}'::text[]) k(key)
+;
+SELECT throws_ok(
+    format(
+      $$SELECT trunklet.$$ || format
+      , j
+    )
+    , format( '%s is not supported as a parameter type', jsonb_typeof(j->'value') )
+  )
+  FROM
+    unnest(array[
+        $$process_language('format', 'template', %L::jsonb)$$
+      , $$extract_parameters('format', %L::jsonb, '{a}'::text[])$$
+    ]) f(format)
+    , (SELECT row_to_json(v)::jsonb AS j FROM (VALUES
+      ('{"key":"value"}'::json)
+      , (to_json(array[1,2,3]))
+    ) v(value) ) j
 ;
 
 \i test/pgxntool/finish.sql
