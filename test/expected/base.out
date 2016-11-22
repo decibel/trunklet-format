@@ -14,13 +14,6 @@ ok 12 - test optional handling with L and
 ok 13 - test optional handling with L and text
 ok 14 - test optional handling with L and true
 ok 15 - threw 22004: SQL identifier format option ("I") not allowed with optional parameters
-THIS ERROR IS OK!
-DETAIL:  parameter "test parameter" at template position 11
-ERROR:  SQL identifier format option ("I") not allowed with optional parameters
-DETAIL:  parameter "test parameter" at template position 11
-HINT:  SQL identifiers can not be NULL or empty, so identifier formats may not be optional.
-CONTEXT:  SQL statement "SELECT _trunklet_functions.language_id_0000000001__process( CAST($1 AS text), CAST($2 AS jsonb) )"
-PL/pgSQL function trunklet.process_language(character varying,text,anyelement) line 27 at EXECUTE statement
 ok 16 - threw Unexpected character "" in format specifier ""
 ok 17 - threw Unexpected character "" in format specifier "O"
 ok 18 - threw Unexpected character "a" in format specifier "a"
@@ -31,18 +24,6 @@ ok 22 - threw Unexpected character "i" in format specifier "i"
 ok 23 - threw Unexpected character "i" in format specifier "Oi"
 ok 24 - threw Unexpected character "l" in format specifier "l"
 ok 25 - threw Unexpected character "l" in format specifier "Ol"
-THIS ERROR IS OK!
-DETAIL:  parameter "Moo" at template position 5
-ERROR:  Unexpected character "S" in format specifier "OS"
-DETAIL:  parameter "Moo" at template position 5
-CONTEXT:  SQL statement "SELECT _trunklet_functions.language_id_0000000001__process( CAST($1 AS text), CAST($2 AS jsonb) )"
-PL/pgSQL function trunklet.process_language(character varying,text,anyelement) line 27 at EXECUTE statement
-THIS ERROR IS OK!
-DETAIL:  parameter "Moo" at template position 5
-ERROR:  Unexpected character "l" in format specifier "l"
-DETAIL:  parameter "Moo" at template position 5
-CONTEXT:  SQL statement "SELECT _trunklet_functions.language_id_0000000001__process( CAST($1 AS text), CAST($2 AS jsonb) )"
-PL/pgSQL function trunklet.process_language(character varying,text,anyelement) line 27 at EXECUTE statement
 ok 26 - Should throw exception like 'parameter "mia" not found'
 ok 27 - Should throw exception like 'parameter "mia" not found'
 ok 28 - Should throw exception like 'parameter "mia" not found'
