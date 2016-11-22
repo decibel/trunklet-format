@@ -107,11 +107,13 @@ SELECT throws_ok(
 );
 SAVEPOINT a;
 \unset ON_ERROR_STOP
+\set VERBOSITY default
 \echo THIS ERROR IS OK!
 SELECT 'DETAIL:  parameter "test parameter" at template position ' || strpos( 'some stuff%test parameter%OIsome more stuff', '%' );
 SELECT trunklet.process_language( 'format', 'some stuff%test parameter%OIsome more stuff', NULL::json );
 ROLLBACK TO a;
 \set ON_ERROR_STOP 1
+\set VERBOSITY VERBOSE
 
 SELECT throws_ok(
     format(
@@ -130,6 +132,7 @@ SELECT throws_ok(
 ;
 SAVEPOINT a;
 \unset ON_ERROR_STOP
+\set VERBOSITY default
 \echo THIS ERROR IS OK!
 SELECT 'DETAIL:  parameter "Moo" at template position ' || strpos( 'more%Moo%OSmore', '%' );
 SELECT trunklet.process_language('format', 'more%Moo%OSmore', NULL::json);
@@ -139,6 +142,7 @@ SELECT 'DETAIL:  parameter "Moo" at template position ' || strpos( 'more%Moo%OSm
 SELECT trunklet.process_language('format', 'more%Moo%lmore', NULL::json);
 ROLLBACK TO a;
 \set ON_ERROR_STOP 1
+\set VERBOSITY VERBOSE
 
 SELECT throws_like(
     format(
