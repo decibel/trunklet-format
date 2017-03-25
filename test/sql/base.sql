@@ -33,6 +33,25 @@ SELECT is(
 SELECT is(
   trunklet.process_language(
     'format'
+    , text $$%nope%OLx%nope2%Os$$
+    , NULL::jsonb
+  )
+  , 'NULLx'
+  , $$Optional parameter.$$
+);
+SELECT is(
+  trunklet.process_language(
+    'format'
+    , text $$%nope%OLx%nope2%Os$$
+    , jsonb $${"Moo": "cow"}$$
+  )
+  , 'NULLx'
+  , $$Optional parameter.$$
+);
+
+SELECT is(
+  trunklet.process_language(
+    'format'
     , text $$A %test%s test.$$
     , jsonb $${
         "test": "simple"

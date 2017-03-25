@@ -1,31 +1,31 @@
 \set ECHO none
 ok 1
 ok 2
-ok 3
-ok 4
+ok 3 - Optional parameter.
+ok 4 - Optional parameter.
 ok 5
 ok 6
-ok 7 - test optional handling with s and 1.1
-ok 8 - test optional handling with s and 
-ok 9 - test optional handling with s and text
-ok 10 - test optional handling with s and true
-ok 11 - test optional handling with L and 1.1
-ok 12 - test optional handling with L and 
-ok 13 - test optional handling with L and text
-ok 14 - test optional handling with L and true
-ok 15 - threw 22004: SQL identifier format option ("I") not allowed with optional parameters
-ok 16 - threw Unexpected character "" in format specifier ""
-ok 17 - threw Unexpected character "" in format specifier "O"
-ok 18 - threw Unexpected character "a" in format specifier "a"
-ok 19 - threw Unexpected character "a" in format specifier "Oa"
-ok 20 - threw Unexpected character "S" in format specifier "S"
-ok 21 - threw Unexpected character "S" in format specifier "OS"
-ok 22 - threw Unexpected character "i" in format specifier "i"
-ok 23 - threw Unexpected character "i" in format specifier "Oi"
-ok 24 - threw Unexpected character "l" in format specifier "l"
-ok 25 - threw Unexpected character "l" in format specifier "Ol"
-ok 26 - Should throw exception like 'parameter "mia" not found'
-ok 27 - Should throw exception like 'parameter "mia" not found'
+ok 7
+ok 8
+ok 9 - test optional handling with s and 1.1
+ok 10 - test optional handling with s and 
+ok 11 - test optional handling with s and text
+ok 12 - test optional handling with s and true
+ok 13 - test optional handling with L and 1.1
+ok 14 - test optional handling with L and 
+ok 15 - test optional handling with L and text
+ok 16 - test optional handling with L and true
+ok 17 - threw 22004: SQL identifier format option ("I") not allowed with optional parameters
+ok 18 - threw Unexpected character "" in format specifier ""
+ok 19 - threw Unexpected character "" in format specifier "O"
+ok 20 - threw Unexpected character "a" in format specifier "a"
+ok 21 - threw Unexpected character "a" in format specifier "Oa"
+ok 22 - threw Unexpected character "S" in format specifier "S"
+ok 23 - threw Unexpected character "S" in format specifier "OS"
+ok 24 - threw Unexpected character "i" in format specifier "i"
+ok 25 - threw Unexpected character "i" in format specifier "Oi"
+ok 26 - threw Unexpected character "l" in format specifier "l"
+ok 27 - threw Unexpected character "l" in format specifier "Ol"
 ok 28 - Should throw exception like 'parameter "mia" not found'
 ok 29 - Should throw exception like 'parameter "mia" not found'
 ok 30 - Should throw exception like 'parameter "mia" not found'
@@ -48,28 +48,30 @@ ok 46 - Should throw exception like 'parameter "mia" not found'
 ok 47 - Should throw exception like 'parameter "mia" not found'
 ok 48 - Should throw exception like 'parameter "mia" not found'
 ok 49 - Should throw exception like 'parameter "mia" not found'
-ok 50 - Test extract_paramaters() for single string
-ok 51 - Test extract_paramaters() for number
-ok 52 - Test extract_paramaters() for multiple
-ok 53 - Test extract_paramaters() for num & bogus
-ok 54 - Test extract_paramaters() for bogus
-ok 55 - SELECT trunklet.process_language('format', 'template', ('{"value": 1.1}'::jsonb)->'value')
-ok 56 - SELECT trunklet.process_language('format', 'template', ('{"value": "text"}'::jsonb)->'value')
-ok 57 - SELECT trunklet.process_language('format', 'template', ('{"value": true}'::jsonb)->'value')
-ok 58 - SELECT trunklet.process_language('format', 'template', ('{"value": [1, 2, 3]}'::jsonb)->'value')
-ok 59 - SELECT trunklet.extract_parameters('format', ('{"value": 1.1}'::jsonb)->'value', '{a}'::text[])
-ok 60 - SELECT trunklet.extract_parameters('format', ('{"value": "text"}'::jsonb)->'value', '{a}'::text[])
-ok 61 - SELECT trunklet.extract_parameters('format', ('{"value": true}'::jsonb)->'value', '{a}'::text[])
-ok 62 - SELECT trunklet.extract_parameters('format', ('{"value": [1, 2, 3]}'::jsonb)->'value', '{a}'::text[])
-ok 63 - process_language('format', 'template', %L::jsonb): parameter names may not contain "%"
-ok 64 - process_language('format', 'template', %L::jsonb): parameter names may not contain "%"
+ok 50 - Should throw exception like 'parameter "mia" not found'
+ok 51 - Should throw exception like 'parameter "mia" not found'
+ok 52 - Test extract_paramaters() for single string
+ok 53 - Test extract_paramaters() for number
+ok 54 - Test extract_paramaters() for multiple
+ok 55 - Test extract_paramaters() for num & bogus
+ok 56 - Test extract_paramaters() for bogus
+ok 57 - SELECT trunklet.process_language('format', 'template', ('{"value": 1.1}'::jsonb)->'value')
+ok 58 - SELECT trunklet.process_language('format', 'template', ('{"value": "text"}'::jsonb)->'value')
+ok 59 - SELECT trunklet.process_language('format', 'template', ('{"value": true}'::jsonb)->'value')
+ok 60 - SELECT trunklet.process_language('format', 'template', ('{"value": [1, 2, 3]}'::jsonb)->'value')
+ok 61 - SELECT trunklet.extract_parameters('format', ('{"value": 1.1}'::jsonb)->'value', '{a}'::text[])
+ok 62 - SELECT trunklet.extract_parameters('format', ('{"value": "text"}'::jsonb)->'value', '{a}'::text[])
+ok 63 - SELECT trunklet.extract_parameters('format', ('{"value": true}'::jsonb)->'value', '{a}'::text[])
+ok 64 - SELECT trunklet.extract_parameters('format', ('{"value": [1, 2, 3]}'::jsonb)->'value', '{a}'::text[])
 ok 65 - process_language('format', 'template', %L::jsonb): parameter names may not contain "%"
-ok 66 - extract_parameters('format', %L::jsonb, '{a}'::text[]): parameter names may not contain "%"
-ok 67 - extract_parameters('format', %L::jsonb, '{a}'::text[]): parameter names may not contain "%"
+ok 66 - process_language('format', 'template', %L::jsonb): parameter names may not contain "%"
+ok 67 - process_language('format', 'template', %L::jsonb): parameter names may not contain "%"
 ok 68 - extract_parameters('format', %L::jsonb, '{a}'::text[]): parameter names may not contain "%"
-ok 69 - threw object is not supported as a parameter type
-ok 70 - threw array is not supported as a parameter type
+ok 69 - extract_parameters('format', %L::jsonb, '{a}'::text[]): parameter names may not contain "%"
+ok 70 - extract_parameters('format', %L::jsonb, '{a}'::text[]): parameter names may not contain "%"
 ok 71 - threw object is not supported as a parameter type
 ok 72 - threw array is not supported as a parameter type
-1..72
+ok 73 - threw object is not supported as a parameter type
+ok 74 - threw array is not supported as a parameter type
+1..74
 # TRANSACTION INTENTIONALLY LEFT OPEN!
