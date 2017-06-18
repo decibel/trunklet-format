@@ -34,6 +34,7 @@ $(DESTDIR)$(datadir)/extension/trunklet.control:
 
 .PHONY: extension_drop
 extension_drop: $(DESTDIR)$(datadir)/extension/extension_drop.control
+# 0.1.1 fixes dependencies
 $(DESTDIR)$(datadir)/extension/extension_drop.control:
-	pgxn install --unstable extension_drop
+	pgxn install --unstable 'extension_drop>=0.1.1'
 
