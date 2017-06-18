@@ -1,4 +1,8 @@
 \set ECHO none
+ extension_drop__add 
+---------------------
+(0 rows)
+
  template_language__add 
 ------------------------
  

@@ -1,0 +1,11 @@
+\set ECHO none
+1..8
+ok 1 - Create extension
+ok 2 - A second extension_drop__add() call fails
+ok 3 - Drop extension
+ok 4 - Create extension
+ok 5 - Add test template
+ok 6 - Drop extension
+ok 7 - Remove test template
+ok 8 - Drop extension
+# TRANSACTION INTENTIONALLY LEFT OPEN!

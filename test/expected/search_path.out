@@ -1,0 +1,5 @@
+\set ECHO none
+1..2
+ok 1 - verify search_path has not changed without cascade
+ok 2 - verify search_path has not changed with cascade
+# TRANSACTION INTENTIONALLY LEFT OPEN!

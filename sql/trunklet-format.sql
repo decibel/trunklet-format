@@ -1,3 +1,34 @@
+SELECT extension_drop__add(
+  'trunklet-format'
+  -- WARNING! Our language name is format, not trunklet-format!
+  , $sql$SELECT trunklet.template_language__remove('format', ignore_missing_functions => true)$sql$
+)
+  /*
+   * Only register the drop if we're being run as part of extension creation.
+   * It might look like this would be bad if the extension *already* existed
+   * before we ran, but in that case we're going to get an error from __add().
+   */
+  WHERE EXISTS( SELECT 1 FROM pg_extension WHERE extname = 'trunklet-format' )
+;
+
+/*
+CREATE FUNCTION _trunklet._extension_drop__format(
+) RETURNS event_trigger LANGUAGE plpgsql AS $body$
+BEGIN
+  RAISE WARNING 'drop';
+  IF EXISTS(SELECT 1 FROM pg_catalog.pg_event_trigger_dropped_objects() WHERE object_type = 'EXTENSION' AND object_identifier = 'trunklet-format') THEN
+--SELECT trunklet.template_language__remove(
+    DELETE FROM _trunklet.language WHERE language_name = 'format';
+  END IF;
+END
+$body$;
+CREATE EVENT TRIGGER trunklet__format_drop
+  ON sql_drop
+  WHEN tag IN ( 'DROP EXTENSION' )
+  EXECUTE PROCEDURE _trunklet._extension_drop__format()
+;
+*/
+
 SELECT trunklet.template_language__add(
   language_name := 'format'
   , parameter_type := 'jsonb'

@@ -73,12 +73,14 @@
     "X_comment": "Valid keys for 'prereqs' are configure, build, runtime, or test.",
     "X_comment": "Valid keys for 'requires' are requires, recommends, suggests, or conflicts.",
     "X_comment": "Requires JSONB, which was released in 9.4",
+    "X_comment": "Requires support for droping a language in trunklet; released in 0.3.0",
     "prereqs": {
 
         "build": {
             "requires": {
                 "PostgreSQL": "9.4.0",
-                "trunklet": ">= 0.2.0"
+                "extension_drop": 0,
+                "trunklet": ">= 0.3.0"
             }
         },
         "runtime": {

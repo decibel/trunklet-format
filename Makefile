@@ -25,10 +25,15 @@ endif # ASCIIDOC
 #
 .PHONY: deps
 install: deps
-deps: trunklet
+deps: trunklet extension_drop
 
 .PHONY: trunklet
 trunklet: $(DESTDIR)$(datadir)/extension/trunklet.control
-
 $(DESTDIR)$(datadir)/extension/trunklet.control:
-	pgxn install --unstable 'trunklet>=0.2.0'
+	pgxn install 'trunklet>=0.3.3' # 0.3.3 adds support for ignore_missing_functions
+
+.PHONY: extension_drop
+extension_drop: $(DESTDIR)$(datadir)/extension/extension_drop.control
+$(DESTDIR)$(datadir)/extension/extension_drop.control:
+	pgxn install --unstable extension_drop
+
