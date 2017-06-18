@@ -8,9 +8,6 @@ SELECT plan(
 );
 
 SAVEPOINT a;
-CREATE EXTENSION trunklet CASCADE;
-CREATE EXTENSION extension_drop CASCADE;
-
 CREATE TEMP TABLE before AS
   SELECT current_setting('search_path')
 ;
@@ -36,7 +33,7 @@ CREATE TEMP TABLE before AS
   SELECT current_setting('search_path')
 ;
 
-CREATE EXTENSION "trunklet-format" CASCADE;
+CREATE EXTENSION "trunklet-format" ;
 
 CREATE TEMP TABLE after AS
   SELECT current_setting('search_path')

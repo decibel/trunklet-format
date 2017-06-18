@@ -10,10 +10,10 @@ SELECT plan(
     + 2 -- Drop succeeds after unregistering template
 );
 
-SET client_min_messages = WARNING; -- Necessary due to CASCADE
+--SET client_min_messages = WARNING; -- Necessary due to CASCADE
 -- Drop-reload
 SELECT lives_ok(
-    'CREATE EXTENSION "trunklet-format" CASCADE;'
+    'CREATE EXTENSION "trunklet-format" ;'
     , 'Create extension'
 );
 -- We assume this works, so test it...
@@ -35,7 +35,7 @@ SELECT lives_ok(
     , 'Drop extension'
 );
 SELECT lives_ok(
-    'CREATE EXTENSION "trunklet-format" CASCADE;'
+    'CREATE EXTENSION "trunklet-format" ;'
     , 'Create extension'
 );
 SET client_min_messages = NOTICE; -- Can switch back now that we're done creating extensions
