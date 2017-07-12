@@ -22,7 +22,7 @@ SELECT throws_ok(
 SELECT extension_drop__add(
   'trunklet-format'
   -- WARNING! Our language name is format, not trunklet-format!
-  , $sql$SELECT trunklet.template_language__remove('format', ignore_missing_functions => true)$sql$
+  , $sql$SELECT trunklet.template_language__remove('format', ignore_missing_functions := true)$sql$
 )
   $throws$
   , '23505' --duplicate key

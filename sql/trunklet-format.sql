@@ -1,7 +1,7 @@
 SELECT extension_drop__add(
   'trunklet-format'
   -- WARNING! Our language name is format, not trunklet-format!
-  , $sql$SELECT trunklet.template_language__remove('format', ignore_missing_functions => true)$sql$
+  , $sql$SELECT trunklet.template_language__remove('format', ignore_missing_functions := true)$sql$
 )
   /*
    * Only register the drop if we're being run as part of extension creation.
