@@ -13,7 +13,7 @@ SELECT plan(
 --SET client_min_messages = WARNING; -- Necessary due to CASCADE
 -- Drop-reload
 SELECT lives_ok(
-    'CREATE EXTENSION "trunklet-format" ;'
+    'SELECT pg_temp._create();'
     , 'Create extension'
 );
 -- We assume this works, so test it...
@@ -35,7 +35,7 @@ SELECT lives_ok(
     , 'Drop extension'
 );
 SELECT lives_ok(
-    'CREATE EXTENSION "trunklet-format" ;'
+    'SELECT pg_temp._create();'
     , 'Create extension'
 );
 SET client_min_messages = NOTICE; -- Can switch back now that we're done creating extensions

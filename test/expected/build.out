@@ -1,4 +1,9 @@
 \set ECHO none
+ _create 
+---------
+ 
+(1 row)
+
  extension_drop__add 
 ---------------------
 (0 rows)

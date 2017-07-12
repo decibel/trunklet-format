@@ -1,5 +1,6 @@
 \set ECHO none
 \i test/pgxntool/setup.sql
+\i test/deps.sql
 
 SELECT plan(
     0
@@ -12,7 +13,7 @@ CREATE TEMP TABLE before AS
   SELECT current_setting('search_path')
 ;
 
-CREATE EXTENSION "trunklet-format";
+SELECT pg_temp._create();
 
 CREATE TEMP TABLE after AS
   SELECT current_setting('search_path')
@@ -33,7 +34,7 @@ CREATE TEMP TABLE before AS
   SELECT current_setting('search_path')
 ;
 
-CREATE EXTENSION "trunklet-format" ;
+SELECT pg_temp._create();
 
 CREATE TEMP TABLE after AS
   SELECT current_setting('search_path')
